@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Resume Form</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <h1>Resume Form</h1>
+
+    <form id="resumeForm" enctype="multipart/form-data">
+      <h2>Personal Information</h2>
+      <label for="name">Name:</label>
+      <input type="text" id="name" required /><br /><br />
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" required /><br /><br />
+
+      <label for="profileImage">Profile Image:</label>
+      <input
+        type="file"
+        id="profileImage"
+        accept="image/*"
+        required
+      /><br /><br />
+
+      <h2>Degrees</h2>
+      <div id="degrees">
+        <div class="degree">
+          <label for="degree0">Degree:</label>
+          <input type="text" id="degree0" required />
+          <label for="university0">University:</label>
+          <input type="text" id="university0" required />
+        </div>
+      </div>
+      <button type="button" onclick="addDegree()">Add Degree</button
+      ><br /><br />
+
+      <h2>Employment Experiences</h2>
+      <div id="experiences">
+        <div class="experience">
+          <label for="company0">Company:</label>
+          <input type="text" id="company0" required />
+          <label for="position1">Position:</label>
+          <input type="text" id="position0" required />
+        </div>
+      </div>
+      <button type="button" onclick="addExperience()">Add Experience</button
+      ><br /><br />
+
+      <h2>Skills</h2>
+      <div id="skills">
+        <div class="skill">
+          <label for="skill0">Skill:</label>
+          <input type="text" id="skill0" required />
+        </div>
+      </div>
+      <button type="button" onclick="addSkill()">Add Skill</button><br /><br />
+
+      <input type="submit" value="Submit" />
+    </form>
+
+    <script>
+      var degreeCount = 0;
+      var experienceCount = 0;
+      var skillCount = 0;
+
+      function addDegree() {
+        degreeCount++;
+        var degreesContainer = document.getElementById("degrees");
+        var newDegree = document.createElement("div");
+        newDegree.className = "degree";
+        newDegree.innerHTML = `
+        <label for="degree${degreeCount}">Degree:</label>
+        <input type="text" id="degree${degreeCount}" required>
+        <label for="university${degreeCount}">University:</label>
+        <input type="text" id="university${degreeCount}" required>
+      `;
+        degreesContainer.appendChild(newDegree);
+      }
+
+      function addExperience() {
+        experienceCount++;
+        var experiencesContainer = document.getElementById("experiences");
+        var newExperience = document.createElement("div");
+        newExperience.className = "experience";
+        newExperience.innerHTML = `
+        <label for="company${experienceCount}">Company:</label>
+        <input type="text" id="company${experienceCount}" required>
+        <label for="position${experienceCount}">Position:</label>
+        <input type="text" id="position${experienceCount}" required>
+      `;
+        experiencesContainer.appendChild(newExperience);
+      }
+
+      function addSkill() {
+        skillCount++;
+        var skillsContainer = document.getElementById("skills");
+        var newSkill = document.createElement("div");
+        newSkill.className = "skill";
+        newSkill.innerHTML = `
+        <label for="skill${skillCount}">Skill:</label>
+        <input type="text" id="skill${skillCount}" required>
+      `;
+        skillsContainer.appendChild(newSkill);
+      }
+
+      $("#resumeForm").submit(function (event) {
+        event.preventDefault();
+
+        // Collect form data
+        var formData = new FormData();
+        formData.append("name", $("#name").val());
+        formData.append("email", $("#email").val());
+        formData.append("profileImage", $("#profileImage")[0].files[0]);
+
+        // Add degrees data
+        for (var i = 0; i <= degreeCount; i++) {
+          formData.append(`degrees[${i}][degree]`, $(`#degree${i}`).val());
+          formData.append(
+            `degrees[${i}][university]`,
+            $(`#university${i}`).val()
+          );
+        }
+
+        // Add experiences data
+        for (var i = 0; i <= experienceCount; i++) {
+          formData.append(
+            `experiences[${i}][company]`,
+            $(`#company${i}`).val()
+          );
+          formData.append(
+            `experiences[${i}][position]`,
+            $(`#position${i}`).val()
+          );
+        }
+
+        // Add skills data
+        for (var i = 0; i <= skillCount; i++) {
+          formData.append(`skills[${i}]`, $(`#skill${i}`).val());
+        }
+
+        // Send form data to the server using Node.js
+        $.ajax({
+          type: "POST",
+          url: "/submit",
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function (response) {
+            alert("Resume submitted successfully!");
+            // Handle response from the server if needed
+          },
+          error: function () {
+            alert("Error submitting the resume.");
+          },
+        });
+      });
+    </script>
+  </body>
+</html>
