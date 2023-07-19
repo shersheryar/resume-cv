@@ -5,7 +5,19 @@ const path = require("path");
 const mysql = require("mysql");
 
 const app = express();
-const port = 3008;
+const port = 3001;
+const updateRoute = require("./update");
+const deleteRoute = require("./delete");
+const viewRoute = require("./view");
+
+app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "uploads")));
+
+// Use the route files for respective APIs
+app.use("/", updateRoute);
+app.use("/", deleteRoute);
+app.use("/", viewRoute);
 
 // Configure multer for file upload
 const storage = multer.diskStorage({
@@ -161,6 +173,38 @@ app.post("/submit", upload.single("profileImage"), (req, res) => {
   });
 });
 
+////-------------------------------------------get Data------------------------------------
+// Handle GET request to fetch all resumes
+app.get("/resumes", (req, res) => {
+  // Get a connection from the pool
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.error("Error connecting to the database");
+      throw err;
+    }
+
+    // Query to fetch all resumes from the 'resumes' table
+    const selectResumesSql = "SELECT * FROM resumes";
+
+    // Execute the SQL query
+    connection.query(selectResumesSql, (err, resumes) => {
+      // Release the connection back to the pool
+      connection.release();
+
+      if (err) {
+        console.error("Error executing the SQL query");
+        throw err;
+      }
+
+      // Send the resumes data as the response
+      res.json(resumes);
+      console.log(resumes);
+    });
+  });
+});
+app.get("/resume", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "resumes.html"));
+});
 // Start the server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
