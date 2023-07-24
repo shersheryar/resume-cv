@@ -43,15 +43,39 @@
         return button;
       }
 
-      // Function to handle the "View" button click
       function onViewClick(resumeId) {
-        alert("View clicked for Resume ID: " + resumeId);
+        // alert("View clicked for Resume ID: " + resumeId);
+        // // Replace this with the actual resume ID
+        fetch("/view/:id" + resumeId, {
+          method: "post",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => {
+            if (response.ok) {
+              // alert("Resume with ID " + resumeId + " updated successfully!");
+            } else {
+              alert("Failed to view resume with ID " + resumeId);
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching resume data:", error);
+          });
+        // Handle the response from the backend here
+        // You can use `resumeData` to populate the resume details on the page
+        console.log(resumeId);
+        window.location.href = "/resumeViews";
+
+        // Redirect to the resumeView route
+
+        // sendResumeIdToBackend(resumeId);
       }
 
       // Function to handle the "Edit" button click
       function onEditClick(resumeId) {
         // Call the update API
-        fetch("/update/" + resumeId, {
+        fetch("/resume/:id" + resumeId, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -65,6 +89,7 @@
           .then((response) => {
             if (response.ok) {
               alert("Resume with ID " + resumeId + " updated successfully!");
+              location.reload();
             } else {
               alert("Failed to update resume with ID " + resumeId);
             }
@@ -77,12 +102,13 @@
       // Function to handle the "Delete" button click
       function onDeleteClick(resumeId) {
         // Call the delete API
-        fetch("/delete/" + resumeId, {
+        fetch("/resume/:id" + resumeId, {
           method: "DELETE",
         })
           .then((response) => {
             if (response.ok) {
               alert("Resume with ID " + resumeId + " deleted successfully!");
+              location.reload();
             } else {
               alert("Failed to delete resume with ID " + resumeId);
             }
@@ -93,11 +119,12 @@
       }
 
       // Fetch resumes data from the server
-      fetch("/resumes")
+      fetch("/resumess")
         .then((response) => response.json())
-        .then((resumes) => {
+        .then((resumess) => {
+          // console.log(32);
           // Loop through the retrieved resumes and populate the table
-          resumes.forEach((resume) => {
+          resumess.forEach((resume) => {
             const row = document.createElement("tr");
 
             // Add data to each cell in the row

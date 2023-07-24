@@ -15,11 +15,12 @@ const pool = mysql.createPool(dbConfig);
 
 // Update a resume by ID
 router.put("/resume/:id", (req, res) => {
-  const resumeId = req.params.id;
+  const resumeId = req.params.id.slice(3);
   const resumeData = req.body;
 
   // Process the resumeData as needed before updating
-
+  console.log(resumeId);
+  console.log(resumeData);
   // Update resume data in the database
   pool.getConnection((err, connection) => {
     if (err) {

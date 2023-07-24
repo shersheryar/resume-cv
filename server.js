@@ -5,7 +5,7 @@ const path = require("path");
 const mysql = require("mysql");
 
 const app = express();
-const port = 3001;
+const port = 3006;
 const updateRoute = require("./update");
 const deleteRoute = require("./delete");
 const viewRoute = require("./view");
@@ -13,6 +13,7 @@ const viewRoute = require("./view");
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "uploads")));
+// Serve static files from the "public" directory
 
 // Use the route files for respective APIs
 app.use("/", updateRoute);
@@ -34,12 +35,6 @@ const upload = multer({ storage: storage });
 // Parse JSON body
 app.use(bodyParser.json());
 
-// Serve static files from the "public" directory
-app.use(express.static(path.join(__dirname, "public")));
-
-// Serve static files from the "uploads" directory
-app.use(express.static(path.join(__dirname, "uploads")));
-
 // MySQL database connection configuration
 const dbConfig = {
   host: "localhost",
@@ -54,6 +49,12 @@ const pool = mysql.createPool(dbConfig);
 // Handle GET request to serve the index.html file
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+app.get("/resumes", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "resumes.html"));
+});
+app.get("/resumeViews", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "frontPage.html"));
 });
 
 // Handle POST request to /submit
@@ -175,7 +176,7 @@ app.post("/submit", upload.single("profileImage"), (req, res) => {
 
 ////-------------------------------------------get Data------------------------------------
 // Handle GET request to fetch all resumes
-app.get("/resumes", (req, res) => {
+app.get("/resumess", (req, res) => {
   // Get a connection from the pool
   pool.getConnection((err, connection) => {
     if (err) {
@@ -197,14 +198,12 @@ app.get("/resumes", (req, res) => {
       }
 
       // Send the resumes data as the response
-      res.json(resumes);
-      console.log(resumes);
+      res.send(resumes);
+      // console.log(resumes);
     });
   });
 });
-app.get("/resume", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "resumes.html"));
-});
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

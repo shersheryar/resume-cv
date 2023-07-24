@@ -15,7 +15,7 @@ const pool = mysql.createPool(dbConfig);
 
 // Delete a resume by ID
 router.delete("/resume/:id", (req, res) => {
-  const resumeId = req.params.id;
+  const resumeId = req.params.id.slice(3);
 
   // Delete resume data from the database
   pool.getConnection((err, connection) => {
@@ -23,7 +23,7 @@ router.delete("/resume/:id", (req, res) => {
       console.error("Error connecting to the database");
       return res.status(500).json({ error: "Database error" });
     }
-
+    console.log("resume:", resumeId);
     // Delete the resume from the 'resumes' table
     const deleteResumeSql = "DELETE FROM resumes WHERE id = ?";
     const deleteResumeValues = [resumeId];
